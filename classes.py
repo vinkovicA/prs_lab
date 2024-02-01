@@ -15,11 +15,26 @@ class Job:
 
 
 class TestCase:
-    def __init__(self, jobs: List[Job], system_type: str):
+    def __init__(self, system_type: str, test_case_number: int, jobs: List[Job] = None):
         if system_type == 'n/1' or system_type == 'n/m':
-            self.jobs = jobs
+            self.system_type = system_type
+            self.test_case_number = test_case_number
+
+            if jobs is None:
+                self.jobs = []
+            else:
+                self.jobs = jobs
         else:
             raise ValueError('Invalid system type.')
+
+    def __repr__(self):
+        return f'Test case {self.test_case_number} of type with {len(self.jobs)} jobs.'
+
+    def add_job(self, job: Job):
+        self.jobs.append(job)
+
+    def add_jobs(self, jobs: List[Job]):
+        self.jobs.extend(jobs)
 
 
 class TestCaseN1(TestCase):
