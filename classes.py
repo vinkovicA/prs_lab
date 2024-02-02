@@ -11,7 +11,7 @@ class Job:
         self.processing_time = processing_time
 
     def __repr__(self):
-        return f'Job of length: {self.processing_time}, \tdue: {self.due_date})'
+        return f'(t={self.processing_time}, d={self.due_date})'
 
 
 class TestCase:

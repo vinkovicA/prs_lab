@@ -74,7 +74,7 @@ def find_longest_job_idx(jobs: List[Job]) -> int:
 
     return longest_job_idx
 
-def output_starting_times(jobs: List[Job]) -> List[int]:
+def calculate_starting_times(jobs: List[Job]) -> List[int]:
     """Outputs the starting times of the jobs in the list, based on their order and processing times.
 
     e.g. for sorted jobs with processing times [10,15,20] the output would be [0,10,25]
