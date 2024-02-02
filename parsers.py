@@ -3,9 +3,7 @@ from typing import List
 from classes import TestCase, Job
 
 
-def parse_input_file(filepath: str):
-    # TODO: This is not working code, just a placeholder for the algorithm execution
-
+def parse_input_file(filepath: str) -> List[TestCase]:
     """Parses input file in format given as:
     ```
     n/1
@@ -38,11 +36,31 @@ def parse_input_file(filepath: str):
     for i, line in enumerate(lines):
         if line.startswith('n/1'):
             # parse test cases from this line onwards or until next 'n/1' or 'n/m' line
-            parse_test_cases(lines[i+1:], system_type='n/1')
+            new_test_cases = parse_test_cases(lines[i + 1:], system_type='n/1')
+            test_cases.extend(new_test_cases)
+
+        elif line.startswith('n/m'):
+            # parse test cases from this line onwards or until next 'n/1' or 'n/m' line
+            test_cases.extend(parse_test_cases(lines[i + 1:], system_type='n/m'))
+
     return test_cases
 
 
-def parse_test_case(lines: str):
+def parse_test_cases(lines: List[str], system_type: str) -> List[TestCase]:
+    test_cases: List[TestCase] = []
+    current_test_case: TestCase
+
+    for i, line in enumerate(lines):
+        if "sustav" in line:
+            test_cases.append(parse_test_case(lines[i:], system_type))
+
+        elif line.startswith('n/m') or line.startswith('n/1'):
+            return test_cases
+
+    return test_cases
+
+
+def parse_test_case(lines: List[str], system_type: str = None) -> TestCase:
     # TODO: Validate parsing, not tested
 
     """Parses test case from given lines.
@@ -55,20 +73,25 @@ def parse_test_case(lines: str):
     TestCase(system_type='n/1', test_case_number=1, jobs=[Job(due_date=12, processing_time=5),
                                                           Job(due_date=20, processing_time=6)])
     """
-    for i,line in enumerate(lines):
+    deadlines = None
+    processing_times = None
+    jobs = None
+
+    for i, line in enumerate(lines):
         if "sustav" in line:
             # New test case
             jobs: List[Job] = []
             test_case_number = int(line.split(' ')[0].split('.')[0])
 
-            if 'M' in line:
+            if 'M' in line or system_type == 'n/m':
                 system_type = 'n/m'
                 makespan = parse_makespan(line)
-            else:
+                test_case = TestCase(system_type=system_type, test_case_number=test_case_number, jobs=jobs,
+                                     makespan=makespan)
+
+            elif system_type == 'n/1' or system_type is None:
                 system_type = 'n/1'
-
-
-            test_case = TestCase(system_type=system_type, test_case_number=test_case_number, jobs=jobs)
+                test_case = TestCase(system_type=system_type, test_case_number=test_case_number, jobs=jobs)
 
         elif line.startswith('t = '):
             # parse all values as a list of ints using list comprehension
@@ -80,41 +103,19 @@ def parse_test_case(lines: str):
 
         elif line.startswith('J = '):
             # TODO: Add parsing for n/m test cases (can be across several lines)
-            jobs = None
-            jobs = parse_nm_jobs(lines[i:])
-            pass
+            break
+            #jobs = parse_nm_jobs(lines[i:])
 
         if deadlines and processing_times:
+            # add jobs to n/1 test case
             test_case.add_jobs(create_n1_jobs(deadlines, processing_times))
             return test_case
 
         if jobs:
+            # add jobs to n/m test case
+            break
             test_case.add_jobs(jobs)
             return test_case
-
-
-def parse_test_cases(lines: List[str], system_type: str):
-    test_cases: List[TestCase] = []
-    current_test_case: TestCase
-    # TODO: OVO NIJE GOTOVO, TRENUTNO JE CIJELA FUNKCIJA REDUDANTNA!
-    # bit cu pametniji ujutro
-
-    for i, line in enumerate(lines):
-            test_cases.append(parse_test_case(lines[i:]))
-        else:
-            raise ValueError(f"Test case format mismatch for given system type {system_type} and current ")
-
-
-        if current_test_case is not None:
-            test_cases.append(current_test_case)
-            current_test_case = []
-        current_test_case.append(line)
-
-    # Add the last test case if it wasn't added in the loop
-    if current_test_case:
-        test_cases.append(current_test_case)
-
-    return test_cases
 
 
 def parse_makespan(line: str) -> int:
@@ -131,6 +132,7 @@ def create_n1_jobs(deadlines: List[int], processing_times: List[int]) -> List[Jo
     for deadline, processing_time in zip(deadlines, processing_times):
         jobs.append(Job(due_date=deadline, processing_time=processing_time))
     return jobs
+
 
 def parse_nm_jobs(lines: str):
     # TODO: Validate parsing, not teste
@@ -149,4 +151,10 @@ def parse_nm_jobs(lines: str):
         pass
 
 
-
+if __name__ == '__main__':
+    # Test parsing
+    test_cases = parse_input_file('test_n1.txt')
+    for test_case in test_cases:
+        print(test_case)
+        print(test_case.jobs)
+        print()
