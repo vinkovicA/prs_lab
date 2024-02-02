@@ -31,8 +31,6 @@ def sort_jobs_moores(jobs: List[Job]) -> List[Job]:
     sorted_non_late_jobs = sort_jobs_edd(jobs)
     late_jobs = []
 
-    sorted_jobs = sort_jobs_edd(jobs)
-
     # K2: Find the first job in `sorted_non_late_jobs` that is late
     job_to_remove_idx = None
     while True:
@@ -44,8 +42,8 @@ def sort_jobs_moores(jobs: List[Job]) -> List[Job]:
         current_time = 0
         job_to_remove_idx = None
         for i, job in enumerate(sorted_non_late_jobs):
-            job_finish_time = current_time + job.processing_time
-            if job_finish_time > job.due_date:
+            current_time += job.processing_time
+            if current_time > job.due_date:
                 # Job is late, find the longest job within first `i` `sorted_non_late_jobs` entries
                 job_to_remove_idx = find_longest_job_idx(sorted_non_late_jobs[:i+1])
                 break
