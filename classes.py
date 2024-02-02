@@ -15,7 +15,7 @@ class Job:
 
 
 class TestCase:
-    def __init__(self, system_type: str, test_case_number: int, jobs: List[Job] = None):
+    def __init__(self, system_type: str, test_case_number: int, jobs: List[Job] = None, makespan: int = None):
         if system_type == 'n/1' or system_type == 'n/m':
             self.system_type = system_type
             self.test_case_number = test_case_number
@@ -24,6 +24,9 @@ class TestCase:
                 self.jobs = []
             else:
                 self.jobs = jobs
+
+            if system_type == 'n/m':
+                self.makespan = makespan
         else:
             raise ValueError('Invalid system type.')
 
