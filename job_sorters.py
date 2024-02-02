@@ -45,7 +45,7 @@ def sort_jobs_moores(jobs: List[Job]) -> List[Job]:
             current_time += job.processing_time
             if current_time > job.due_date:
                 # Job is late, find the longest job within first `i` `sorted_non_late_jobs` entries
-                job_to_remove_idx = find_longest_job_idx(sorted_non_late_jobs[:i+1])
+                job_to_remove_idx = find_longest_job_idx(sorted_non_late_jobs[:i + 1])
                 break
 
         if job_to_remove_idx is None:
@@ -74,6 +74,7 @@ def find_longest_job_idx(jobs: List[Job]) -> int:
 
     return longest_job_idx
 
+
 def calculate_starting_times(jobs: List[Job]) -> List[int]:
     """Outputs the starting times of the jobs in the list, based on their order and processing times.
 
@@ -86,14 +87,22 @@ def calculate_starting_times(jobs: List[Job]) -> List[int]:
         current_time += job.processing_time
 
     return starting_times
-def sort_jobs_mwkr(jobs: List[Job]):
+
+
+def sort_nm_jobs_mwkr(jobs: List[Job]) -> List[Job]:
     """
     Implement MWKR priority-based heuristic algorithm. MWKR prioritizes with the most work remaining (MWR) heuristic.
     """
     pass
 
+def sort_nm_jobs_spt(jobs: List[Job]) -> List[Job]:
+    """
+    Implement SPT priority-based heuristic algorithm. SPT prioritizes with the shortest processing time (SPT) heuristic.
+    """
+    pass
 
 def calculate_remaining_work(job: Job, time) -> int:
+    """Calculates the remaining work of the job at the given time. Used for MWKR algorithm."""
     pass
 
 
