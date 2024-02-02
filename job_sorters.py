@@ -117,6 +117,29 @@ def main():
         print(result)
         print()
 
+
+def local_test():
+    # Create 3 jobs and sort them using EDD, SPT and Moores algorithms
+    jobs = [Job(19, 10), Job(20, 20), Job(35, 15)]
+    print('Original jobs:')
+    print(jobs)
+    print()
+
+    print('Sorted by EDD:')
+    print(sort_jobs_edd(jobs))
+    print(f"s={calculate_starting_times(sort_jobs_edd(jobs))}")
+    print()
+
+    print('Sorted by SPT:')
+    print(sort_jobs_spt(jobs))
+    print(f"s={calculate_starting_times(sort_jobs_spt(jobs))}")
+    print()
+
+    print('Sorted by Moores:')
+    print(sort_jobs_moores(jobs))
+    print(f"s={calculate_starting_times(sort_jobs_moores(jobs))}")
+
+
 if __name__ == "__main__":
-    main()
+    local_test()
 
