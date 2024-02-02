@@ -6,7 +6,7 @@ Autori:
     - Ante Vinković, 0246080077
 
 """
-
+from parsers import parse_input_file
 from classes import Job
 from typing import List
 
@@ -95,41 +95,20 @@ def sort_nm_jobs_mwkr(jobs: List[Job]) -> List[Job]:
     """
     pass
 
+
 def sort_nm_jobs_spt(jobs: List[Job]) -> List[Job]:
     """
     Implement SPT priority-based heuristic algorithm. SPT prioritizes with the shortest processing time (SPT) heuristic.
     """
     pass
 
+
 def calculate_remaining_work(job: Job, time) -> int:
     """Calculates the remaining work of the job at the given time. Used for MWKR algorithm."""
     pass
 
 
-def execute_algorithm(test_case):
-    # TODO: This is not working code, just a placeholder for the algorithm execution
-    if isinstance(test_case, TestCaseN1):
-        result = spt_algorithm(test_case.t, test_case.d)
-    elif isinstance(test_case, TestCaseNM):
-        result = mwkr_algorithm(test_case.J)
-    return result
-
-def main():
-    file_path = 'test_sustavi.txt'
-    test_cases = parse_input(file_path)
-
-    for idx, test_case in enumerate(test_cases, start=1):
-        # TODO: This is not working code, just a placeholder for the algorithm execution
-
-        print(f'Test Case {idx}:')
-        result = execute_algorithm(test_case)
-        print(result)
-        print()
-
-
-def local_test():
-    # Create 3 jobs and sort them using EDD, SPT and Moores algorithms
-    jobs = [Job(19, 10), Job(20, 20), Job(35, 15)]
+def run_n1(jobs: List[Job]) -> None:
     print('Original jobs:')
     print(jobs)
     print()
@@ -149,6 +128,41 @@ def local_test():
     print(f"s={calculate_starting_times(sort_jobs_moores(jobs))}")
 
 
+def run_nm(jobs: List[Job]) -> None:
+    print('Original jobs:')
+    print(jobs)
+    print()
+
+    print('Sorted using heuristics with MWKR priority:')
+    print(sort_nm_jobs_mwkr(jobs))
+    print(f"s={calculate_starting_times(sort_jobs_mwkr(jobs))}")
+
+    print('Sorted using heuristics with SPT priority:')
+    print(sort_nm_jobs_spt(jobs))
+    print(f"s={calculate_starting_times(sort_nm_jobs_spt(jobs))}")
+
+
+def execute_algorithms(test_cases):
+    for tc in test_cases:
+        if tc.system_type == 'n/1':
+            run_n1(tc.jobs)
+        elif tc.system_type == 'n/m':
+            run_nm(tc.jobs)
+
+
+def main():
+    file_path = 'test_sustavi.txt'
+    test_cases = parse_input_file(file_path)
+    execute_algorithms(test_cases)
+
+
+def local_test():
+    # Create 3 jobs and sort them using EDD, SPT and Moores algorithms
+    jobs = [Job(due_date=19, processing_time=10),
+            Job(due_date=20, processing_time=20),
+            Job(due_date=35, processing_time=15)]
+
+
+
 if __name__ == "__main__":
     local_test()
-
