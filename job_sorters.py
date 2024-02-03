@@ -105,28 +105,70 @@ def sort_nm_jobs_spt(jobs: List[Job]) -> List[Job]:
 
 def calculate_remaining_work(job: Job, time) -> int:
     """Calculates the remaining work of the job at the given time. Used for MWKR algorithm."""
+    # TODO: Maybe change the input arguments, this is a placeholder function prototype
     pass
 
 
+def calculate_total_time(sorted_jobs: List[Job]) -> float:
+    """Returns the sum of total times required to process all jobs in the list."""
+    total_time = 0
+    for job in sorted_jobs:
+        total_time += (total_time + job.processing_time)
+    return total_time
+
+
+def calculate_ct(sorted_jobs: List[Job]) -> float:
+    """Returns average cycle time as a sum of all processing times and all queue times, divided by the number of jobs"""
+    total_time = calculate_total_time(sorted_jobs)
+    return total_time / len(sorted_jobs)
+
+
+def calculate_ct_uk(sorted_jobs: List[Job]) -> float:
+    """Returns the sum of all processing times of the jobs in the list.
+    Equivalent to the total time required to process all the jobs."""
+    return sum(job.processing_time for job in sorted_jobs)
+
+
+def calculate_ct_k(sorted_jobs: List[Job]) -> float:
+    """Returns the sum of all queue times of the jobs in the list."""
+    total_time = calculate_total_time(sorted_jobs)
+    return total_time - calculate_ct_uk(sorted_jobs)    # ct_k = ct - ct_uk
+
+
+def calculate_wip(sorted_jobs: List[Job]) -> float:
+    ct = calculate_ct(sorted_jobs)
+    th = len(sorted_jobs) / calculate_total_time(sorted_jobs)
+    return ct * th
+
+
+def print_job_stats(jobs: List[Job]) -> None:
+    print(f"s = {calculate_starting_times(jobs)}")
+    print(f"\tCT = {calculate_ct(jobs)}")
+    print(f"\tCT_uk = {calculate_ct_uk(jobs)}")
+    print(f"\tCT_k = {calculate_ct_k(jobs)}")
+    print(f"\tWIP = {calculate_wip(jobs)}")
+    print()
+
+
 def run_n1(jobs: List[Job]) -> None:
+    jobs_sorted_moores = sort_jobs_moores(jobs)
+    jobs_sorted_edd = sort_jobs_edd(jobs)
+    jobs_sorted_spt = sort_jobs_spt(jobs)
+
     print('Original jobs:')
     print(jobs)
     print()
 
     print('Sorted by EDD:')
-    print(sort_jobs_edd(jobs))
-    print(f"s={calculate_starting_times(sort_jobs_edd(jobs))}")
-    print()
+    print_job_stats(jobs_sorted_edd)
 
     print('Sorted by SPT:')
-    print(sort_jobs_spt(jobs))
-    print(f"s={calculate_starting_times(sort_jobs_spt(jobs))}")
-    print()
+    print_job_stats(jobs_sorted_spt)
 
     print('Sorted by Moores:')
-    print(sort_jobs_moores(jobs))
-    print(f"s={calculate_starting_times(sort_jobs_moores(jobs))}")
+    print_job_stats(jobs_sorted_moores)
 
+    print("- - - - - - - - - - - - -\n")
 
 def run_nm(jobs: List[Job]) -> None:
     print('Original jobs:')
@@ -151,7 +193,7 @@ def execute_algorithms(test_cases):
 
 
 def main():
-    file_path = 'test_sustavi.txt'
+    file_path = 'test_n1.txt'
     test_cases = parse_input_file(file_path)
     execute_algorithms(test_cases)
 
@@ -161,8 +203,9 @@ def local_test():
     jobs = [Job(due_date=19, processing_time=10),
             Job(due_date=20, processing_time=20),
             Job(due_date=35, processing_time=15)]
-
+    run_n1(jobs)
 
 
 if __name__ == "__main__":
-    local_test()
+    #local_test()
+    main()
