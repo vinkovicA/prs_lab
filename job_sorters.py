@@ -170,6 +170,7 @@ def run_n1(jobs: List[Job]) -> None:
 
     print("- - - - - - - - - - - - -\n")
 
+
 def run_nm(jobs: List[Job]) -> None:
     print('Original jobs:')
     print(jobs)
@@ -183,6 +184,8 @@ def run_nm(jobs: List[Job]) -> None:
     print(sort_nm_jobs_spt(jobs))
     print(f"s={calculate_starting_times(sort_nm_jobs_spt(jobs))}")
 
+    print("- - - - - - - - - - - - -\n")
+
 
 def execute_algorithms(test_cases):
     for tc in test_cases:
@@ -193,7 +196,7 @@ def execute_algorithms(test_cases):
 
 
 def main():
-    file_path = 'test_n1.txt'
+    file_path = 'input/test_n1.txt'
     test_cases = parse_input_file(file_path)
     execute_algorithms(test_cases)
 
@@ -207,5 +210,5 @@ def local_test():
 
 
 if __name__ == "__main__":
-    #local_test()
+    # local_test()
     main()

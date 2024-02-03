@@ -12,7 +12,7 @@ def parse_input_file(filepath: str) -> List[TestCase]:
     d = [7,10,18,40,35]
     ```
         where:
-      - n. sustav = the current test case
+      - n. sustav = the current input case
       - t = a list of processing times for given jobs
       - d = deadlines for given jobs
 
@@ -23,7 +23,7 @@ def parse_input_file(filepath: str) -> List[TestCase]:
     J = [[(1,5),(2,10),(3,7)], [(2,1),(3,8),(1,10)], [(3,5),(2,10),(1,4)]]
 
             where:
-      - i. sustav = the i-th test case
+      - i. sustav = the i-th input case
       - M =  optimal makespan of the optimized system - for later grading
       - J = a list of lists of tuples, where each sublist represents a job made up of k tuples,
         each tuple being an operation on a given machine (tuple[0]), with given duration (tuple[1])
@@ -35,12 +35,12 @@ def parse_input_file(filepath: str) -> List[TestCase]:
 
     for i, line in enumerate(lines):
         if line.startswith('n/1'):
-            # parse test cases from this line onwards or until next 'n/1' or 'n/m' line
+            # parse input cases from this line onwards or until next 'n/1' or 'n/m' line
             new_test_cases = parse_test_cases(lines[i + 1:], system_type='n/1')
             test_cases.extend(new_test_cases)
 
         elif line.startswith('n/m'):
-            # parse test cases from this line onwards or until next 'n/1' or 'n/m' line
+            # parse input cases from this line onwards or until next 'n/1' or 'n/m' line
             test_cases.extend(parse_test_cases(lines[i + 1:], system_type='n/m'))
 
     return test_cases
@@ -63,7 +63,7 @@ def parse_test_cases(lines: List[str], system_type: str) -> List[TestCase]:
 def parse_test_case(lines: List[str], system_type: str = None) -> TestCase:
     # TODO: Validate parsing, not tested
 
-    """Parses test case from given lines.
+    """Parses input case from given lines.
     Example:
           1. sustav
           t = [ 5, 6]
@@ -79,7 +79,7 @@ def parse_test_case(lines: List[str], system_type: str = None) -> TestCase:
 
     for i, line in enumerate(lines):
         if "sustav" in line:
-            # New test case
+            # New input case
             jobs: List[Job] = []
             test_case_number = int(line.split(' ')[0].split('.')[0])
 
@@ -102,17 +102,17 @@ def parse_test_case(lines: List[str], system_type: str = None) -> TestCase:
             deadlines = [int(token.strip()) for token in line.split('=')[1].strip()[1:-1].split(',')]
 
         elif line.startswith('J = '):
-            # TODO: Add parsing for n/m test cases (can be across several lines)
+            # TODO: Add parsing for n/m input cases (can be across several lines)
             break
             #jobs = parse_nm_jobs(lines[i:])
 
         if deadlines and processing_times:
-            # add jobs to n/1 test case
+            # add jobs to n/1 input case
             test_case.add_jobs(create_n1_jobs(deadlines, processing_times))
             return test_case
 
         if jobs:
-            # add jobs to n/m test case
+            # add jobs to n/m input case
             break
             test_case.add_jobs(jobs)
             return test_case
@@ -153,7 +153,7 @@ def parse_nm_jobs(lines: str):
 
 if __name__ == '__main__':
     # Test parsing
-    test_cases = parse_input_file('test_n1.txt')
+    test_cases = parse_input_file('input/test_n1.txt')
     for test_case in test_cases:
         print(test_case)
         print(test_case.jobs)
