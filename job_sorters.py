@@ -89,8 +89,7 @@ def calculate_starting_times(jobs: List[Job]) -> List[int]:
 
     return starting_times
 
-
-def sort_nm_jobs_mwkr(jobs: List[JobNM]) -> List[JobNM]:
+def sort_nm_jobs_mwkr(jobs: List[JobNM], return_st_time : bool) -> List[JobNM]:
     """
     Implement MWKR priority-based heuristic algorithm. MWKR prioritizes with the most work remaining (MWR) heuristic.
     """
@@ -101,9 +100,15 @@ def sort_nm_jobs_mwkr(jobs: List[JobNM]) -> List[JobNM]:
                 num_of_machines = operation.machine
 
     machine_timelines = [0] * num_of_machines
+
     machine_jobs = []
     for i in range(num_of_machines):
         machine_jobs.append([])
+
+    starting_times = []
+    for i in range(num_of_machines):
+        starting_times.append([])
+
     done_flag = False
     t = 0
     while(not(done_flag)):
@@ -150,7 +155,9 @@ def sort_nm_jobs_mwkr(jobs: List[JobNM]) -> List[JobNM]:
                 if (jobs[i].processing_time() <= t2) and available_machines[machine]:
                     # Commit to job
                     machine_jobs[machine].append(next_operations[i])
-                    machine_timelines[machine] += next_operations[i].processing_time
+                    st_time = max(machine_timelines[machine], t2)
+                    starting_times[machine].append(st_time - next_operations[i].processing_time)
+                    machine_timelines[machine] = st_time + next_operations[i].processing_time
                     removed = jobs[i].operations.pop(0)
                     available_machines[machine] = False
                     #print(f'Accepted operation {removed}')
@@ -158,10 +165,12 @@ def sort_nm_jobs_mwkr(jobs: List[JobNM]) -> List[JobNM]:
         
         t += 1
 
+    if return_st_time:
+        return starting_times
     return machine_jobs
 
 
-def sort_nm_jobs_spt(jobs: List[JobNM]) -> List[JobNM]:
+def sort_nm_jobs_spt(jobs: List[JobNM], return_st_time) -> List[JobNM]:
     """
     Implement SPT priority-based heuristic algorithm. SPT prioritizes with the shortest processing time (SPT) heuristic.
     """ 
@@ -172,9 +181,15 @@ def sort_nm_jobs_spt(jobs: List[JobNM]) -> List[JobNM]:
                 num_of_machines = operation.machine
 
     machine_timelines = [0] * num_of_machines
+
     machine_jobs = []
     for i in range(num_of_machines):
         machine_jobs.append([])
+
+    starting_times = []
+    for i in range(num_of_machines):
+        starting_times.append([])
+
     done_flag = False
     t = 0
     while(not(done_flag)):
@@ -221,7 +236,9 @@ def sort_nm_jobs_spt(jobs: List[JobNM]) -> List[JobNM]:
                 if (machine_timelines[machine] + next_operations[i].processing_time <= t2) and available_machines[machine]:
                     # Commit to job
                     machine_jobs[machine].append(next_operations[i])
-                    machine_timelines[machine] += next_operations[i].processing_time
+                    st_time = max(machine_timelines[machine], t2)
+                    starting_times[machine].append(st_time - next_operations[i].processing_time)
+                    machine_timelines[machine] = st_time + next_operations[i].processing_time
                     removed = jobs[i].operations.pop(0)
                     available_machines[machine] = False
                     #print(f'Accepted operation {removed}')
@@ -229,6 +246,8 @@ def sort_nm_jobs_spt(jobs: List[JobNM]) -> List[JobNM]:
         
         t += 1
 
+    if return_st_time:
+        return starting_times
     return machine_jobs
 
 
@@ -305,16 +324,22 @@ def run_nm(jobs: List[JobNM]) -> None:
     print(jobs)
     print()
 
-    jobs_mwkr = copy.deepcopy(jobs)
-    jobs_spt = copy.deepcopy(jobs)
+    jobs_mwkr_1 = copy.deepcopy(jobs)
+    jobs_mwkr_2 = copy.deepcopy(jobs)
+    jobs_spt_1 = copy.deepcopy(jobs)
+    jobs_spt_2 = copy.deepcopy(jobs)
 
     print('Sorted using heuristics with MWKR priority:')
-    print(sort_nm_jobs_mwkr(jobs_mwkr))
-    #print(f"s={calculate_starting_times_nm(sort_nm_jobs_mwkr(jobs))}")
+    print("- - Machine jobs - -")
+    print(sort_nm_jobs_mwkr(jobs_mwkr_1, False))
+    print("- - Starting_times - -")
+    print(f"s={sort_nm_jobs_mwkr(jobs_mwkr_2, True)}")
 
     print('Sorted using heuristics with SPT priority:')
-    print(sort_nm_jobs_spt(jobs_spt))
-    #print(f"s={calculate_starting_times_nm(sort_nm_jobs_spt(jobs))}")
+    print("- - Machine jobs - -")
+    print(sort_nm_jobs_spt(jobs_spt_1, False))
+    print("- - Starting_times - -")
+    print(f"s={sort_nm_jobs_spt(jobs_spt_2, True)}")
 
     print("- - - - - - - - - - - - -\n")
 
@@ -328,7 +353,7 @@ def execute_algorithms(test_cases):
 
 
 def main():
-    file_path = 'input/test_n1.txt'
+    file_path = 'input/test_nm.txt'
     test_cases = parse_input_file(file_path)
     execute_algorithms(test_cases)
 
