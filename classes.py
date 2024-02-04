@@ -23,7 +23,7 @@ class JobNM:
             self.operations = operations
 
     def __repr__(self):
-        return f'[Job:\n{self.operations}\n]'
+        return f'NM job  with {len(self.operations)} operations:\n{self.operations}\n'
     
     def duration(self):
         t = 0
@@ -46,7 +46,7 @@ class Job:
 
 
 class TestCase:
-    def __init__(self, system_type: str, test_case_number: int, jobs: List[Job] = None, makespan: int = None):
+    def __init__(self, system_type: str, test_case_number: int, jobs: List = None, makespan: int = None):
         if system_type == 'n/1' or system_type == 'n/m':
             self.system_type = system_type
             self.test_case_number = test_case_number
@@ -62,7 +62,7 @@ class TestCase:
             raise ValueError('Invalid system type.')
 
     def __repr__(self):
-        return f'Test case {self.test_case_number} of type with {len(self.jobs)} jobs.'
+        return f'Test case {self.test_case_number} of type {self.system_type} with {len(self.jobs)} jobs.'
 
     def add_job(self, job: Job):
         self.jobs.append(job)
