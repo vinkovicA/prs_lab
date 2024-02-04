@@ -16,8 +16,11 @@ class Operation:
 class JobNM:
     operations: List[Operation]
 
-    def __init__(self, operations: List[Operation]):
-        self.operations = operations
+    def __init__(self, operations: List[Operation]=None):
+        if operations is None:
+            self.operations = []
+        else:
+            self.operations = operations
 
     def __repr__(self):
         return f'[Job:\n{self.operations}\n]'
