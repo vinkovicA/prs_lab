@@ -13,6 +13,31 @@ class Job:
     def __repr__(self):
         return f'(t={self.processing_time}, d={self.due_date})'
 
+class JobNM:
+    operations: []
+
+    def __init__(self, operations: []):
+        self.operations = operations
+
+    def __repr__(self):
+        return f'[Job:\n{self.operations}\n]'
+    
+    def duration(self):
+        t = 0
+        for operation in self.operations:
+            t += operation.processing_time
+        return t
+
+class Operation:
+    machine: int
+    processing_time: int
+
+    def __init__(self, machine: int, processing_time: int):
+        self.machine = machine
+        self.processing_time = processing_time
+
+    def __repr__(self):
+        return f'(m={self.machine}, t={self.processing_time})'
 
 class TestCase:
     def __init__(self, system_type: str, test_case_number: int, jobs: List[Job] = None, makespan: int = None):
@@ -41,7 +66,7 @@ class TestCase:
 
 
 class TestCaseN1(TestCase):
-    def __init__(super, t, d):
+    def __init__(self, t, d):
         self.t = t
         self.d = d
 

@@ -7,7 +7,7 @@ Autori:
 
 """
 from parsers import parse_input_file
-from classes import Job
+from classes import *
 from typing import List
 
 
@@ -89,17 +89,35 @@ def calculate_starting_times(jobs: List[Job]) -> List[int]:
     return starting_times
 
 
-def sort_nm_jobs_mwkr(jobs: List[Job]) -> List[Job]:
+def sort_nm_jobs_mwkr(jobs: List[JobNM]) -> List[JobNM]:
     """
     Implement MWKR priority-based heuristic algorithm. MWKR prioritizes with the most work remaining (MWR) heuristic.
     """
     pass
 
 
-def sort_nm_jobs_spt(jobs: List[Job]) -> List[Job]:
+def sort_nm_jobs_spt(jobs: List[JobNM]) -> List[JobNM]:
     """
     Implement SPT priority-based heuristic algorithm. SPT prioritizes with the shortest processing time (SPT) heuristic.
     """
+    indexes = []
+    num_of_machines = 0
+    for job in jobs:
+        indexes.append(0)
+        for operation in job.operations:
+            if operation.machine > num_of_machines:
+                num_of_machines = operation.machine
+
+    machine_timelines = [0] * num_of_machines
+
+    done_flag = False
+    while(not(done_flag)):
+        operations = []
+        for i in len(jobs):
+            operations.append[jobs[i].operations[indexes[i]]] # Fetch all active operations
+            
+
+    
     pass
 
 
@@ -171,14 +189,14 @@ def run_n1(jobs: List[Job]) -> None:
     print("- - - - - - - - - - - - -\n")
 
 
-def run_nm(jobs: List[Job]) -> None:
+def run_nm(jobs: List[JobNM]) -> None:
     print('Original jobs:')
     print(jobs)
     print()
 
     print('Sorted using heuristics with MWKR priority:')
     print(sort_nm_jobs_mwkr(jobs))
-    print(f"s={calculate_starting_times(sort_jobs_mwkr(jobs))}")
+    print(f"s={calculate_starting_times(sort_nm_jobs_mwkr(jobs))}")
 
     print('Sorted using heuristics with SPT priority:')
     print(sort_nm_jobs_spt(jobs))
