@@ -99,26 +99,50 @@ def sort_nm_jobs_mwkr(jobs: List[JobNM]) -> List[JobNM]:
 def sort_nm_jobs_spt(jobs: List[JobNM]) -> List[JobNM]:
     """
     Implement SPT priority-based heuristic algorithm. SPT prioritizes with the shortest processing time (SPT) heuristic.
-    """
-    indexes = []
+    """ 
     num_of_machines = 0
     for job in jobs:
-        indexes.append(0)
         for operation in job.operations:
             if operation.machine > num_of_machines:
                 num_of_machines = operation.machine
 
     machine_timelines = [0] * num_of_machines
-
+    machine_jobs = [[]] * num_of_machines
     done_flag = False
+    t = 0
     while(not(done_flag)):
-        operations = []
-        for i in len(jobs):
-            operations.append[jobs[i].operations[indexes[i]]] # Fetch all active operations
-            
+        next_operations = []
+        processing_times = []
+        for job in jobs:
+            # Fetch all ready operations
+            if len(job.operations) != 0:
+                next_operations.append[job.operations[0]]
+                processing_times.append[job.operations[0].processing_time]
+            else:
+                next_operations.append[False]
+                processing_times.append[False]
 
-    
-    pass
+        # Check if done
+        done_flag = True
+        for operation in next_operations:
+            if operation != False:
+                done_flag = False
+                break
+
+        # We now have a list of next operations and processing times for each
+        for i in len(jobs):
+            if next_operations[i] == False:
+                continue
+            machine = next_operations[i].machine - 1
+            if machine_timelines[machine] + next_operations[i].processing_time <= t:
+                # Commit to job
+                machine_jobs[machine].append(i)
+                machine_timelines[machine] += next_operations[i].processing_time
+                jobs[i].operations.pop()
+        
+        t += 1
+
+    return machine_jobs
 
 
 def calculate_remaining_work(job: Job, time) -> int:

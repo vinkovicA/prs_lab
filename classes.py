@@ -24,12 +24,6 @@ class JobNM:
 
     def __repr__(self):
         return f'[Job:\n{self.operations}\n]'
-    
-    def duration(self):
-        t = 0
-        for operation in self.operations:
-            t += operation.processing_time
-        return t
 
 
 class Job:
