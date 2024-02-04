@@ -36,7 +36,8 @@ def sort_jobs_moores(jobs: List[Job]) -> List[Job]:
     job_to_remove_idx = None
     while True:
         if job_to_remove_idx is not None:
-            # Remove the longest job found within the first i jobs from `sorted_non_late_jobs` and add it to `late_jobs`
+            # Remove the longest job found within the first "i" jobs from `sorted_non_late_jobs`
+            # and add it to `late_jobs`
             late_jobs.append(sorted_non_late_jobs.pop(job_to_remove_idx))
 
         # reset flag and time counter
@@ -334,7 +335,7 @@ def run_nm(jobs: List[JobNM]) -> None:
     print(sort_nm_jobs_mwkr(jobs_mwkr_1, False))
     print("- - Starting_times - -")
     print(f"s={sort_nm_jobs_mwkr(jobs_mwkr_2, True)}")
-
+    print()
     print('Sorted using heuristics with SPT priority:')
     print("- - Machine jobs - -")
     print(sort_nm_jobs_spt(jobs_spt_1, False))
@@ -352,13 +353,12 @@ def execute_algorithms(test_cases):
             run_nm(tc.jobs)
 
 
-def main():
-    file_path = 'input/test_nm.txt'
+def main(file_path: str) -> None:
     test_cases = parse_input_file(file_path)
     execute_algorithms(test_cases)
 
 
-def local_test():
+def local_test() -> None:
     # Create 3 jobs and sort them using EDD, SPT and Moores algorithms
     jobs = [Job(due_date=19, processing_time=10),
             Job(due_date=20, processing_time=20),
@@ -371,5 +371,7 @@ def local_test():
 
 
 if __name__ == "__main__":
+    file_path = 'input/test_sustavi.txt'
+
     # local_test()
-    main()
+    main(file_path)
