@@ -1,6 +1,34 @@
 from typing import List
 
 
+class Operation:
+    machine: int
+    processing_time: int
+
+    def __init__(self, machine: int, processing_time: int):
+        self.machine = machine
+        self.processing_time = processing_time
+
+    def __repr__(self):
+        return f'(m={self.machine}, t={self.processing_time})'
+
+
+class JobNM:
+    operations: List[Operation]
+
+    def __init__(self, operations: List[Operation]):
+        self.operations = operations
+
+    def __repr__(self):
+        return f'[Job:\n{self.operations}\n]'
+    
+    def duration(self):
+        t = 0
+        for operation in self.operations:
+            t += operation.processing_time
+        return t
+
+
 class Job:
     # TODO: Either rename this class to `JobN1` and create a new class `JobNM` or expand this class to support both
     due_date: int
@@ -13,31 +41,6 @@ class Job:
     def __repr__(self):
         return f'(t={self.processing_time}, d={self.due_date})'
 
-class JobNM:
-    operations: []
-
-    def __init__(self, operations: []):
-        self.operations = operations
-
-    def __repr__(self):
-        return f'[Job:\n{self.operations}\n]'
-    
-    def duration(self):
-        t = 0
-        for operation in self.operations:
-            t += operation.processing_time
-        return t
-
-class Operation:
-    machine: int
-    processing_time: int
-
-    def __init__(self, machine: int, processing_time: int):
-        self.machine = machine
-        self.processing_time = processing_time
-
-    def __repr__(self):
-        return f'(m={self.machine}, t={self.processing_time})'
 
 class TestCase:
     def __init__(self, system_type: str, test_case_number: int, jobs: List[Job] = None, makespan: int = None):
