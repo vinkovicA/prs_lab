@@ -155,8 +155,8 @@ def sort_nm_jobs_mwkr(jobs: List[JobNM], return_st_time : bool) -> List[JobNM]:
                 if (jobs[i].processing_time() <= t2) and available_machines[machine]:
                     # Commit to job
                     machine_jobs[machine].append(next_operations[i])
-                    st_time = max(machine_timelines[machine], t2)
-                    starting_times[machine].append(st_time - next_operations[i].processing_time)
+                    st_time = machine_timelines[machine]
+                    starting_times[machine].append(st_time)
                     machine_timelines[machine] = st_time + next_operations[i].processing_time
                     removed = jobs[i].operations.pop(0)
                     available_machines[machine] = False
