@@ -1,6 +1,6 @@
 # TODO: Remove obsolete parsing functions
 from typing import List
-from classes import TestCase, Job
+from classes import TestCase, Job, Operation, JobNM
 
 
 def parse_input_file(filepath: str) -> List[TestCase]:
@@ -61,8 +61,6 @@ def parse_test_cases(lines: List[str], system_type: str) -> List[TestCase]:
 
 
 def parse_test_case(lines: List[str], system_type: str = None) -> TestCase:
-    # TODO: Validate parsing, not tested
-
     """Parses input case from given lines.
     Example:
           1. sustav
@@ -72,6 +70,20 @@ def parse_test_case(lines: List[str], system_type: str = None) -> TestCase:
     should return:
     TestCase(system_type='n/1', test_case_number=1, jobs=[Job(due_date=12, processing_time=5),
                                                           Job(due_date=20, processing_time=6)])
+
+    Whereas the n/m input example:
+    1. sustav, M = 29
+    J = [[(1,5),(2,10)], [(2,1),(3,8)]]
+
+
+    should return:
+    TestCase(system_type='n/m', test_case_number=1, jobs=[JobNM(operations=[Operation(machine=1, processing_time=5),
+                                                                            Operation(machine=2, processing_time=10)
+                                                                            ]),
+                                                          JobNM(operations=[Operation(machine=2, processing_time=1),
+                                                                            Operation(machine=3, processing_time=8)
+                                                                            ])
+                                                          ])
     """
     deadlines = None
     processing_times = None
@@ -80,7 +92,7 @@ def parse_test_case(lines: List[str], system_type: str = None) -> TestCase:
     for i, line in enumerate(lines):
         if "sustav" in line:
             # New input case
-            jobs: List[Job] = []
+            jobs = []
             test_case_number = int(line.split(' ')[0].split('.')[0])
 
             if 'M' in line or system_type == 'n/m':
@@ -102,9 +114,7 @@ def parse_test_case(lines: List[str], system_type: str = None) -> TestCase:
             deadlines = [int(token.strip()) for token in line.split('=')[1].strip()[1:-1].split(',')]
 
         elif line.startswith('J = '):
-            # TODO: Add parsing for n/m input cases (can be across several lines)
-            break
-            #jobs = parse_nm_jobs(lines[i:])
+            jobs = parse_nm_jobs(lines[i:])
 
         if deadlines and processing_times:
             # add jobs to n/1 input case
@@ -113,7 +123,6 @@ def parse_test_case(lines: List[str], system_type: str = None) -> TestCase:
 
         if jobs:
             # add jobs to n/m input case
-            break
             test_case.add_jobs(jobs)
             return test_case
 
@@ -135,26 +144,74 @@ def create_n1_jobs(deadlines: List[int], processing_times: List[int]) -> List[Jo
 
 
 def parse_nm_jobs(lines: str):
-    # TODO: Validate parsing, not teste
-    # TODO: Check what type this should return
     """Parses jobs from given lines, e.g.:
     J = [[(1,5),(2,4),(3,7),(4,18),(5,6),(6,10)], [(2,8),(6,13),(3,3),(4,5),(1,10),(5,6)],
          [(2,6),(3,14),(6,7),(1,7),(5,5),(4,4)], [(4,6),(5,7),(2,8),(1,2),(3,7),(6,15)]]
     """
     jobs = []
-    job = []
-    for line in lines:
-        # parse given jobs from first line
-        pass
 
-        # in case current line ends with `,`, parse next line as well
-        pass
+    joined_string = ''
+    for line in lines:
+        """
+        parse current line, each job contains a list of operations, 
+        where the first element is the machine and the second is the operation duration 
+        example:     J = [[(1,5),(2,10)], [(2,1),(3,8)]] 
+        should output: 
+        [JobNM(operations=[Operation(machine=1, processing_time=5), Operation(machine=2, processing_time=10)]), 
+         JobNM(operations=[Operation(machine=2, processing_time=1), Operation(machine=3, processing_time=8)])]
+        """
+        if line.strip().endswith(','):
+            if line.startswith('J = '):
+                # If the line ends with a comma, remove the newline character and add it to the string
+                joined_string += line.split('=')[-1].strip()
+            else:
+                joined_string += line.strip()
+        else:
+            # If the line does not end with a comma, remove the newline character and add it to the string
+            if line.startswith('J = '):
+                # If the line starts with 'J = ', remove the newline character and add it to the string
+                joined_string += line.split('=')[-1].strip()
+            else:
+                joined_string += line.strip()
+
+        if not line.strip().endswith(','):
+            # print(f"line {line} does not end with a ',', therefore it is the last line of the job")
+            break
+
+    # parse the joined_string for a list of JobNM objects
+    jobs_nm = parse_jobs_nm(joined_string)
+    jobs.extend(jobs_nm)
+    return jobs
+
+
+def parse_jobs_nm(joined_string: str) -> List[JobNM]:
+    operation_tokens_list = [token.strip()[1:] for token in joined_string.strip()[1:-1].split('],')]
+    operation_tokens_list[-1] = operation_tokens_list[-1][:-1]  # remove the last ']'
+
+    job_list = []
+
+    for one_job_operations_token in operation_tokens_list:
+        operations = []
+        for op_token in one_job_operations_token.split('),'):
+            machine, processing_time = op_token.strip('()').split(',')
+            new_op = Operation(machine=int(machine), processing_time=int(processing_time))
+            operations.append(new_op)
+
+        job_nm = JobNM(operations)
+        job_list.append(job_nm)
+    return job_list
 
 
 if __name__ == '__main__':
     # Test parsing
-    test_cases = parse_input_file('input/test_n1.txt')
+    test_cases = parse_input_file('input/test_sustavi.txt')
     for test_case in test_cases:
-        print(test_case)
-        print(test_case.jobs)
+        if test_case.system_type == 'n/1':
+            print(test_case)
+            print(test_case.jobs)
+
+        else:
+            print(test_case)
+            print(test_case.jobs)
+            print(f"makespan: {test_case.makespan}")
         print()

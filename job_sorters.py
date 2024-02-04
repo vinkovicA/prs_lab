@@ -9,6 +9,7 @@ Autori:
 from parsers import parse_input_file
 from classes import *
 from typing import List
+import copy
 
 
 def sort_jobs_edd(jobs: List[Job]) -> List[Job]:
@@ -93,7 +94,71 @@ def sort_nm_jobs_mwkr(jobs: List[JobNM]) -> List[JobNM]:
     """
     Implement MWKR priority-based heuristic algorithm. MWKR prioritizes with the most work remaining (MWR) heuristic.
     """
-    pass
+    num_of_machines = 0
+    for job in jobs:
+        for operation in job.operations:
+            if operation.machine > num_of_machines:
+                num_of_machines = operation.machine
+
+    machine_timelines = [0] * num_of_machines
+    machine_jobs = []
+    for i in range(num_of_machines):
+        machine_jobs.append([])
+    done_flag = False
+    t = 0
+    while(not(done_flag)):
+        #print()
+        #print('NEW ITERATION, JOBS:')
+        next_operations = []
+        for job in jobs:
+            # Fetch all ready operations
+            if len(job.operations) != 0:
+                next_operations.append(job.operations[0])
+                #print(f'{job.operations[0]}')
+            else:
+                next_operations.append(False)
+                #print(f'False')
+
+        #print('Machine timelines:')
+        #for i in range(len(machine_timelines)):
+        #    print(f'Machine {i + 1}: {machine_timelines[i]}')
+
+        # Check if done
+        done_flag = True
+        inner_done_flag = False
+        for operation in next_operations:
+            if operation != False:
+                done_flag = False
+                inner_done_flag = False
+                break
+
+        #print(f't = {t}')
+        t2 = 0
+        available_machines = [False] * num_of_machines
+        for i in range(num_of_machines):
+            if machine_timelines[i] <= t:
+                available_machines[i] = True
+
+        while(not(inner_done_flag)):
+            inner_done_flag = True
+            for i in range(len(jobs)):
+                if next_operations[i] == False:
+                    continue
+                machine = next_operations[i].machine - 1
+                if available_machines[machine]:
+                    inner_done_flag = False
+                if (jobs[i].processing_time() <= t2) and available_machines[machine]:
+                    # Commit to job
+                    machine_jobs[machine].append(next_operations[i])
+                    machine_timelines[machine] += next_operations[i].processing_time
+                    removed = jobs[i].operations.pop(0)
+                    available_machines[machine] = False
+                    #print(f'Accepted operation {removed}')
+            t2 += 1
+        
+        t += 1
+
+    return machine_jobs
 
 
 def sort_nm_jobs_spt(jobs: List[JobNM]) -> List[JobNM]:
@@ -107,38 +172,60 @@ def sort_nm_jobs_spt(jobs: List[JobNM]) -> List[JobNM]:
                 num_of_machines = operation.machine
 
     machine_timelines = [0] * num_of_machines
-    machine_jobs = [[]] * num_of_machines
+    machine_jobs = []
+    for i in range(num_of_machines):
+        machine_jobs.append([])
     done_flag = False
     t = 0
     while(not(done_flag)):
+        #print()
+        #print('NEW ITERATION, JOBS:')
         next_operations = []
-        processing_times = []
         for job in jobs:
             # Fetch all ready operations
             if len(job.operations) != 0:
-                next_operations.append[job.operations[0]]
-                processing_times.append[job.operations[0].processing_time]
+                next_operations.append(job.operations[0])
+                #print(f'{job.operations[0]}')
             else:
-                next_operations.append[False]
-                processing_times.append[False]
+                next_operations.append(False)
+                #print(f'False')
+
+        #print('Machine timelines:')
+        #for i in range(len(machine_timelines)):
+        #    print(f'Machine {i + 1}: {machine_timelines[i]}')
 
         # Check if done
         done_flag = True
+        inner_done_flag = False
         for operation in next_operations:
             if operation != False:
                 done_flag = False
+                inner_done_flag = False
                 break
 
-        # We now have a list of next operations and processing times for each
-        for i in len(jobs):
-            if next_operations[i] == False:
-                continue
-            machine = next_operations[i].machine - 1
-            if machine_timelines[machine] + next_operations[i].processing_time <= t:
-                # Commit to job
-                machine_jobs[machine].append(i)
-                machine_timelines[machine] += next_operations[i].processing_time
-                jobs[i].operations.pop()
+        #print(f't = {t}')
+        t2 = t
+        available_machines = [False] * num_of_machines
+        for i in range(num_of_machines):
+            if machine_timelines[i] <= t:
+                available_machines[i] = True
+
+        while(not(inner_done_flag)):
+            inner_done_flag = True
+            for i in range(len(jobs)):
+                if next_operations[i] == False:
+                    continue
+                machine = next_operations[i].machine - 1
+                if available_machines[machine]:
+                    inner_done_flag = False
+                if (machine_timelines[machine] + next_operations[i].processing_time <= t2) and available_machines[machine]:
+                    # Commit to job
+                    machine_jobs[machine].append(next_operations[i])
+                    machine_timelines[machine] += next_operations[i].processing_time
+                    removed = jobs[i].operations.pop(0)
+                    available_machines[machine] = False
+                    #print(f'Accepted operation {removed}')
+            t2 += 1
         
         t += 1
 
@@ -218,13 +305,16 @@ def run_nm(jobs: List[JobNM]) -> None:
     print(jobs)
     print()
 
+    jobs_mwkr = copy.deepcopy(jobs)
+    jobs_spt = copy.deepcopy(jobs)
+
     print('Sorted using heuristics with MWKR priority:')
-    print(sort_nm_jobs_mwkr(jobs))
-    print(f"s={calculate_starting_times(sort_nm_jobs_mwkr(jobs))}")
+    print(sort_nm_jobs_mwkr(jobs_mwkr))
+    #print(f"s={calculate_starting_times_nm(sort_nm_jobs_mwkr(jobs))}")
 
     print('Sorted using heuristics with SPT priority:')
-    print(sort_nm_jobs_spt(jobs))
-    print(f"s={calculate_starting_times(sort_nm_jobs_spt(jobs))}")
+    print(sort_nm_jobs_spt(jobs_spt))
+    #print(f"s={calculate_starting_times_nm(sort_nm_jobs_spt(jobs))}")
 
     print("- - - - - - - - - - - - -\n")
 
@@ -249,6 +339,10 @@ def local_test():
             Job(due_date=20, processing_time=20),
             Job(due_date=35, processing_time=15)]
     run_n1(jobs)
+
+    #jobs = [JobNM(operations=[Operation(machine=1, processing_time=10), Operation(machine=2, processing_time=1)]),
+    #        JobNM(operations=[Operation(machine=1, processing_time=2), Operation(machine=2, processing_time=20)])]
+    #run_nm(jobs)
 
 
 if __name__ == "__main__":
